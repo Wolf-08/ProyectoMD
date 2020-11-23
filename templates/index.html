@@ -1,1 +1,48 @@
-{% extends 'base.html'%} {% block title %} Algoritmos de mineria de datos {% endblock %} {% block content %} {% endblock %}
+{% extends 'base.html'%} {% block title %} Algoritmos de mineria de datos {% endblock %} {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h4>Bienvenido</h4>
+            <p> Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil sunt necessitatibus, deleniti vitae dignissimos, aliquam consequuntur hic molestiae sapiente et ducimus eligendi at? Eum nostrum, quod odit veniam ducimus sed?</p>
+        </div>
+        <!--Columna 1-->
+
+        <div class="col">
+            <h5>Aqui puedes subir tus archivos</h5>
+            <div class="container">
+                <!-- <div class="row justify-content-md-center">
+                    <h6>Primero define el tipo de archivo</h6>
+                </div> -->
+                <!-- Mensaje de archivo -->
+                <!-- <div class="row justify-content-md-center">
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+												<input type="radio" name="options" id="option1" checked> TXT
+											</label>
+                        <label class="btn btn-secondary">
+												<input type="radio" name="options" id="option2"> CSV
+											</label>
+                        <label class="btn btn-secondary">
+												<input type="radio" name="options" id="option3"> EXCEL
+											</label>
+                    </div>
+                </div> -->
+                <!-- Tipo de archivo -->
+                <form class="data" action="/upload-file" method="POST" enctype=multipart/form-data>
+                    <div class="data caja clearfix">
+                        <div class="campo">
+                            <input type="file" name="file">
+                        </div>
+                        <div class="campo">
+                            <button type="submit" class="btn btn-success">Subir</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <!--Segunda Columa-->
+    </div>
+    <!--Row de las dos primero columnas-->
+</div>
+{% endblock %}

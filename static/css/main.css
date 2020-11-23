@@ -128,6 +128,42 @@ nav.redes-sociales a:last-child {
 }
 
 
+/* Archivos  */
+
+form.data h3 {
+    text-align: center;
+    text-transform: uppercase;
+    margin: 20px 0 0 0;
+}
+
+.data label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.caja {
+    background-color: white;
+    border: 1px solid #e1e1e1;
+    padding: 10px;
+    margin: 10px;
+}
+
+.campo {
+    padding: 20px;
+}
+
+
+/* footer */
+
+p.copyright {
+    /* background-color: #2e2e2e; */
+    color: #ffffff;
+    padding: 10px 0;
+    margin: 20px 0 0 0;
+    text-align: center;
+}
+
+
 /* ==========================================================================
    Helper classes
    ========================================================================== */
