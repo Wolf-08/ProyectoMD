@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os 
+from apyori import apriori
 app = Flask(__name__)
 
 folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\static\\files"
@@ -29,15 +30,32 @@ def files():
     if request.files:
       print("2")
       file=request.files["file"]
+      filename= file.filename
       formato=formatos_permitidos(file.filename)
       file.save(os.path.join(app.config['UPLOAD_FOLDER'],file.filename))
-      #return redirect(url_for('algoritmos',file=file))
-      return redirect(request.url)
+
+      return redirect(url_for('algoritmos',filename=filename))
   return render_template("index.html")
 
-@app.route('/algoritmos/<file>')
-def algoritmos(file):
-  return 'Here going to algoritms'
+@app.route('/algoritmos/<filename>')
+def algoritmos(filename):
+  archivo=str(filename)
+  print(archivo)
+  rutaFile="C:\\Users\\aleja\\Documents\\ProyectoMD\\static\\files\\" + archivo
+  Transacciones=[]
+  Datos=pd.read_csv(rutaFile,header=None)
+  for i in range(0,7501):
+    Transacciones.append([str(Datos.values[i,j]) for j in range (0,20)]) 
+  
+  Reglas = apriori(Transacciones, min_support=0.0045, min_confidence=0.2, min_lift=3, min_length=2) 
+  Resultado = list(Reglas) 
+  print(Resultado[0])
+
+  return render_template("algoritmos.html",
+  Datos=Datos,
+  Transacciones=Transacciones,
+  Reglas=Reglas,
+  Resultado=Resultado)
 
 if __name__ == '__main__':
   app.run(debug=True)
