@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from flas import current_app as app 
+from flask import current_app as app 
 from flask import redirect, render_template,request,url_for
 
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+#import numpy as np
+#import matplotlib.pyplot as plt
+#import pandas as pd
 import os 
 from apyori import apriori
-app = Flask(__name__)
+#app = Flask(__name__)
 
-folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\static\\files"
+folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files"
 ALLOWED_EXTENSIONS = {'txt','csv'}
 app.config['UPLOAD_FOLDER'] = folder
 
@@ -33,28 +33,28 @@ def files():
       formato=formatos_permitidos(file.filename)
       file.save(os.path.join(app.config['UPLOAD_FOLDER'],file.filename))
 
-      return redirect(url_for('algoritmos',filename=filename))
+      return redirect('/dashapp/')
   return render_template("index.html")
 
-@app.route('/algoritmos/<filename>')
-def algoritmos(filename):
-  archivo=str(filename)
-  print(archivo)
-  rutaFile="C:\\Users\\aleja\\Documents\\ProyectoMD\\static\\files\\" + archivo
-  Transacciones=[]
-  Datos=pd.read_csv(rutaFile,header=None)
-  for i in range(0,7501):
-    Transacciones.append([str(Datos.values[i,j]) for j in range (0,20)]) 
+# @app.route('/algoritmos/<filename>')
+# def algoritmos(filename):
+#   archivo=str(filename)
+#   print(archivo)
+#   rutaFile="C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMDs\\static\\files" + archivo
+#   Transacciones=[]
+#   Datos=pd.read_csv(rutaFile,header=None)
+#   for i in range(0,7501):
+#     Transacciones.append([str(Datos.values[i,j]) for j in range (0,20)]) 
   
-  Reglas = apriori(Transacciones, min_support=0.0045, min_confidence=0.2, min_lift=3, min_length=2) 
-  Resultado = list(Reglas) 
-  print(Resultado[0])
+#   Reglas = apriori(Transacciones, min_support=0.0045, min_confidence=0.2, min_lift=3, min_length=2) 
+#   Resultado = list(Reglas) 
+#   print(Resultado[0])
 
-  return render_template("algoritmos.html",
-  Datos=Datos,
-  Transacciones=Transacciones,
-  Reglas=Reglas,
-  Resultado=Resultado)
+#   return render_template("algoritmos.html",
+#   Datos=Datos,
+#   Transacciones=Transacciones,
+#   Reglas=Reglas,
+#   Resultado=Resultado)
 
-if __name__ == '__main__':
-  app.run(debug=True)
+# if __name__ == '__main__':
+#   app.run(debug=True)
