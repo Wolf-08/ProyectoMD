@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-Wolf-08 
-Mineria de Datos
-"""
-from flask import Flask, redirect, render_template,request,url_for
+
+from flas import current_app as app 
+from flask import redirect, render_template,request,url_for
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
