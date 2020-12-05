@@ -10,6 +10,7 @@ from aplicacionMD import routes
 #from .layout import html_layout
 
 
+
 def init_dashboard(server):
     """Create a Plotly Dash dashboard."""
     dash_app = dash.Dash(
@@ -17,8 +18,19 @@ def init_dashboard(server):
         routes_pathname_prefix="/dashapp/",
         external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'],
     )
-
+    #formato,filename=routes.dash1
     # Load DataFrame
+    # archivo=str(filename)
+    # print(archivo)
+    # rutaFile="C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files" + archivo
+    # Transacciones=[]
+    # Datos=pd.read_csv(rutaFile,header=None)
+    # for i in range(0,7501):
+    #  Transacciones.append([str(Datos.values[i,j]) for j in range (0,20)]) 
+  
+    # Reglas = apriori(Transacciones, min_support=0.0045, min_confidence=0.2, min_lift=3, min_length=2) 
+    # Resultado = list(Reglas) 
+    # print(Resultado[0])
     #df = create_dataframe()
 
     # Custom HTML layout

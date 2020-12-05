@@ -99,9 +99,37 @@ textarea {
 
 
 /*
+
+
+/*Globales**/
+
+h2::after {
+    content: '';
+    margin: 0 auto;
+    background-image: url(../img/separador.png);
+    height: 30px;
+    /*alto*/
+    width: 100px;
+    display: block;
+    /*Propiedades bien*/
+}
+
+
+/*
 ----------------------------------------------------------------------
 Pagina principal 
 -------------------------------------------------------------*/
+
+
+/**Header*/
+
+div.hero {
+    background-image: url(../img/datamin2.jpg);
+    height: 100vh;
+    /*Tomar el 100 de alto*/
+    background-position: top center;
+    background-size: cover;
+}
 
 .contenido-header {
     padding-top: 40px;
@@ -113,18 +141,68 @@ Pagina principal
     }
 }
 
-nav.redes-sociales {
+.informacion-evento {
     text-align: center;
+    color: #000;
 }
 
-nav.redes-sociales a {
-    color: rgb(0, 0, 0);
-    font-size: 2em;
-    margin-right: 20px;
+@media (min-width: 768px) {
+    .informacion-evento {
+        width: 70%;
+        margin: 0 auto;
+        margin-top: 50px;
+    }
 }
 
-nav.redes-sociales a:last-child {
-    margin-right: 0;
+div.ocultar {
+    display: none;
+}
+
+.informacion-evento p {
+    margin-left: 20px;
+    font-size: 20px;
+    text-transform: uppercase;
+    display: inline;
+    text-align: left;
+}
+
+.informacion-evento p i {
+    color: #fe4918;
+    font-size: 2.5rem;
+}
+
+.informacion-evento {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-star;
+    margin-left: 15px;
+}
+
+.informacion-evento fecha {
+    justify-content: space-between;
+}
+
+.nombre-sitio {
+    font-family: 'Oswald', sans-serif;
+}
+
+.slogan span {
+    font-weight: 700;
+    text-align: left;
+}
+
+.nombre-sitio {
+    font-size: 5.9vw;
+    text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+    .nombre-sitio {
+        font-size: 10.0vw;
+        line-height: 1;
+        text-align: left;
+        margin-left: 10px;
+    }
 }
 
 

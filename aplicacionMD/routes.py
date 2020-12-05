@@ -32,15 +32,30 @@ def files():
       filename= file.filename
       formato=formatos_permitidos(file.filename)
       file.save(os.path.join(app.config['UPLOAD_FOLDER'],file.filename))
-
-      return redirect('/dashapp/')
+      #dash1(filename,formato)
+      return redirect(url_for('dash1',filename=filename,formato=formato))
+      #return redirect(url_for('/dashboard/',filename=filename,formato=formato))
   return render_template("index.html")
+
+
+@app.route('/dashboard/<filename>/<formato>')
+def dash1(filename,formato):
+  if formato == 'txt':
+    print("no txt")
+  if formato == 'csv':
+    print(formato) 
+    print(filename)
+
+
+  return redirect('/dashapp/')
+
+
 
 # @app.route('/algoritmos/<filename>')
 # def algoritmos(filename):
 #   archivo=str(filename)
 #   print(archivo)
-#   rutaFile="C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMDs\\static\\files" + archivo
+#   rutaFile="C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files" + archivo
 #   Transacciones=[]
 #   Datos=pd.read_csv(rutaFile,header=None)
 #   for i in range(0,7501):
