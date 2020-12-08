@@ -22,7 +22,7 @@ def formatos_permitidos(filename):
     else:
       return False
 
-@app.route('/upload-file', methods=["GET","POST"])
+@app.route('/', methods=["GET","POST"])
 def files():
   if request.method == "POST":
     print("1")
