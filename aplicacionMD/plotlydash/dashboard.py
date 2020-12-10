@@ -9,12 +9,12 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
-#import para el alforitmo
+#import para el algoritmo
 from apyori import apriori
 from dash.exceptions import PreventUpdate
-
 #from .layout import html_layout
 import pandas as pd
+folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files"
 
 def init_dashboard(server):
 	"""Create a Plotly Dash dashboard."""
@@ -37,10 +37,10 @@ def init_dashboard(server):
 				html.A('Selecciona el archivo')
 			]),
 			style= {
-				'width': '98%',
-        'height': '60px',
-        'lineHeight': '60px',
-        'borderWidth': '1px',
+				'width': '50%',
+        'height': '50px',
+        'lineHeight': '50px',
+        'borderWidth': '2px',
         'borderStyle': 'dashed',
         'borderRadius': '5px',
         'textAlign': 'center',
@@ -51,10 +51,6 @@ def init_dashboard(server):
 		#html.Div([
 		#	html.Button(id = 'submit', n_clicks = 0, children = 'Mostrar datos'),
 		#]),
-		html.Div( id = 'output-data-upload' ),
-		html.Hr(),
-		html.Hr(),
-		html.Hr(),
 		html.Div([
 		html.H3("Seleccion de parametros"),
 		html.Div ([
@@ -73,16 +69,14 @@ def init_dashboard(server):
 			html.Button(id = 'submit_button' , n_clicks = 0, children = 'submit'),
 		],style = {'display': 'flex','justifyContent':'center'}),
 		]),
+		html.Div( id = 'output-data-upload' ),
 		html.Div( id = 'output-data-apriori'),
 
 	])
 	
-	
-	def parse_contents(contents, filename,date):
+	def parse_contents(contents, filename):
 		content_type, content_string = contents.split(',')
-
 		decoded = base64.b64decode(content_string)
-
 		try:
 			if 'csv' in filename:
 				df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
@@ -93,14 +87,21 @@ def init_dashboard(server):
 			return html.Div([
 				'Hubo un error cargando el archivo, Formatos permitidos .csv, .txt'
 			])
-		return html.Div([
-			html.H5(filename),
-			html.H6(datetime.datetime.fromtimestamp(date)), 
-
+		return df
+	#def rules(df,support,confidence,lift,length):
+	#Callback recibe el archivo y saca los datos,contenido,nombre
+	@app.callback(Output('output-data-upload', 'children'),
+							[Input('upload-data','contents'),
+              State('upload-data', 'filename')])
+	def update_output(content, name):
+		if content is not None:
+			datos = parse_contents(content,name)
+			return html.Div([
+			html.H5(name),
 			dash_table.DataTable(
 				#create a dictionary 
-				data = df.to_dict('records'),
-				columns = [{'name': i, 'id': i } for i in df.columns],
+				data = datos.to_dict('records'),
+				columns = [{'name': i, 'id': i } for i in datos.columns],
 				page_size = 20,
 				style_table={'overflowX': 'auto'},
 				style_cell={
@@ -113,70 +114,48 @@ def init_dashboard(server):
 				fixed_rows={'headers': True},
 				style_header={'backgroundColor': 'rgb(30, 30, 30)'},
 			),
-
-			html.Hr(), #Linea Horizontal 
-			# html.Div('Raw Content'),
-      # html.Pre(contents[0:50] + '...', 
-			# 	style={
-      #     'whiteSpace': 'pre-wrap',
-      #     'wordBreak': 'break-all'
-      #   })
+			html.Div([
+			html.P("Numero total de Datos: Rows " + str(datos.shape[0]) + " Column: " + str(datos.shape[1]))
+			])
 		])
-
-	def get_registros(df):
-		registros = []
-		#print(df.head())
-		for i in range(len(df.index)):
-			registros.append([str(df.values[i,j]) for j in range(0, 20)])
-		#rules(registros)   
-
-	def rules(support,confidence,lift,length):
-		#soporte minimo,confianza minima,elevacion minima,
-		# registros = get_registros()
-		# Reglas = apriori(registros, 
-		# min_support = support,
-		# min_confidence = confidence, 
-		# min_lift = lift, 
-		# min_length = length)
-
-		# Resultados = list(Reglas)
-		# print(len(Resultados))
-
-		return html.Div([
-			html.H3("REGLAS"),
-			html.P(str(support)),
-			html.P(str(confidence)),
-			html.P(str(lift)),
-			html.P(str(length)),
-		])
-
-
-	#Callback recibe el archivo y saca los datos,contenido,nombre,fecha
-	@app.callback(Output('output-data-upload', 'children'),
-              Input('upload-data', 'contents'),
-							#Input('submit','children'),
-              State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'))
-	def update_output(content, name,date):
-		if content is not None:
-			children = [
-      parse_contents(content,name,date) 
-			]
-			return children
-	#Callback para recibir valores 
+			
+	# #Callback para recibir valores 
 	@app.callback(Output('output-data-apriori','children'),
+							[Input('upload-data','contents'),
 							Input('submit_button','n_clicks'),
+              State('upload-data', 'filename'),
 							State('support','value'),
 							State('confidence','value'),
 							State('lift','value'),
-							State('length','value'),)
-	def update_data(num_clicks,support,confidence,lift,length):
-		if (support and confidence and lift and length) is None:
-			raise PreventUpdate
-		else:
-			children = [
-				rules(support, confidence,lift,length)
-			]
-			return children
+							State('length','value')])
+	def update_data(contents,num_clicks,name,support,confidence,lift,length):
+		if contents:
+			df = parse_contents(contents,name)
+			if (support and confidence and lift and length) is None:
+				raise PreventUpdate
+			else:
+				registros = []
+				for i in range(df.shape[0]):
+	 	 			registros.append([str(df.values[i,j]) for j in range(0,df.shape[1])])
+		
+				Reglas = apriori (
+				registros,
+				min_support = support,
+				min_confidence = confidence,
+				min_lift = lift ,
+				min_length = length,)
+				Resultados = list(Reglas)
+				print(Resultados[0])
+				return html.Div([
+					html.H3("Valores registrados para crear las reglas"),
+					html.P(str(support)),
+					html.P(str(confidence)),
+					html.P(str(lift)),
+					html.P(str(length)),
+					# dash_table.DataTable(
+					# 	data =  
+					# 	columns = 
+					# )
+					])
 	return app.server
 	#-----------------------------------

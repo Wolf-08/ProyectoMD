@@ -11,7 +11,7 @@ from apyori import apriori
 #app = Flask(__name__)
 
 folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files"
-ALLOWED_EXTENSIONS = {'txt','csv'}
+ALLOWED_EXTENSIONS = {'txt','csv','xls'}
 app.config['UPLOAD_FOLDER'] = folder
 
 
@@ -33,23 +33,9 @@ def files():
       formato=formatos_permitidos(file.filename)
       file.save(os.path.join(app.config['UPLOAD_FOLDER'],file.filename))
       #dash1(filename,formato)
-      return redirect(url_for('dash1',filename=filename,formato=formato))
-      #return redirect(url_for('/dashboard/',filename=filename,formato=formato))
+      #return redirect(url_for('dash1',filename=filename,formato=formato))
+      #return redirect(url_for('/das/',filename=filename,formato=formato))
   return render_template("index.html")
-
-
-@app.route('/dashboard/<filename>/<formato>')
-def dash1(filename,formato):
-  if formato == 'txt':
-    print("no txt")
-  if formato == 'csv':
-    print(formato) 
-    print(filename)
-
-
-  return redirect('/dashapp/')
-
-
 
 # @app.route('/algoritmos/<filename>')
 # def algoritmos(filename):
