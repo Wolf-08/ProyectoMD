@@ -16,7 +16,7 @@ from dash.exceptions import PreventUpdate
 import pandas as pd
 folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files"
 
-def init_dashboard(server):
+def init_dashboard1(server):
 	"""Create a Plotly Dash dashboard."""
     #app = dash.Dash(__name__)
 	app = dash.Dash(__name__,server=server,

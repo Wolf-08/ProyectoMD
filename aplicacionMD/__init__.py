@@ -15,13 +15,13 @@ def init_app():
     from . import routes 
     #from . assets import compile_static_assets
     #Importando Dash aplication 
-    from .plotlydash.dashboard import init_dashboard
-    from .plotlydash.correlacion import init_dashboard
+    from .plotlydash.dashboard import init_dashboard1
+    from .plotlydash.correlacion import init_dashboard2
     from .plotlydash.dash2 import init_dashboard
     from .plotlydash.dash3 import init_dashboard
     from .plotlydash.dash4 import init_dashboard
 
-    app = init_dashboard(app)
+    app = init_dashboard2(app)
     #Compilando static assets 
     #compile_static_assets(assets)
 

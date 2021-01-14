@@ -9,27 +9,21 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
-#import para el algoritmo
-from apyori import apriori
 from dash.exceptions import PreventUpdate
-#from .layout import html_layout
 import pandas as pd
-folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files"
-
-def init_dashboard(server):
+def init_dashboard2(server):
 	"""Create a Plotly Dash dashboard."""
     #app = dash.Dash(__name__)
 	app = dash.Dash(__name__,server=server,
 	routes_pathname_prefix="/correlacion/",
 	external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'],
 	)
-
 	#custom html layout 
 	#app.index_string = html_layout
 	#Creacion del layout 
 	app.layout = html.Div([
-		html.H1("Algoritmo Apriori"),
-		html.H2("Subir archivos"),
+		html.H1("Algoritmo de Correlacion"),
+		html.H2("Sube tu archivo"),
 		dcc.Upload(
 			id = 'upload-data',
 			children = html.Div([
@@ -51,29 +45,21 @@ def init_dashboard(server):
 		#html.Div([
 		#	html.Button(id = 'submit', n_clicks = 0, children = 'Mostrar datos'),
 		#]),
-		html.Div([
-		html.H3("Seleccion de parametros"),
-		html.Div ([
-			html.Label('Soporte minimo'),
-			dcc.Input(id = 'support', type = 'number', inputMode = 'numeric',
-			value = 0.0045, min = 0,required = True),
-			html.Label('Confianza Minima'),
-			dcc.Input(id = 'confidence', type = 'number', inputMode = 'numeric',
-			value = 0.2,min = 0,required = True),
-			html.Label('Elevacion'),
-			dcc.Input(id = 'lift', type = 'number', inputMode = 'numeric',
-			value = 3,min = 0,required = True),
-			html.Label('Minimo de elementos'),
-			dcc.Input(id = 'length', type = 'number', inputMode = 'numeric',
-			value = 2,min = 2,required = True),
-			html.Button(id = 'submit_button' , n_clicks = 0, children = 'submit'),
-		],style = {'display': 'flex','justifyContent':'center'}),
-		]),
+		html.Div([ html.H3("Correlacion")]),	
+			# dcc.Tabs(id = 'tabsControlInput',value='tab-1',
+			# children=[
+			# 	dcc.Dropdown(
+			# 		id = 'correlacion',
+			# 		options=[
+			# 			{'label': 'Pearson', 'value': 'pearson'},
+      #       {'label': 'Kendall', 'value': 'kendall'},
+      #       {'label': 'Spearman', 'value': 'spearman'}
+			# 		],
+			# 		value='pearson',style={'width': '50%','margin': '2%'}),
 		html.Div( id = 'output-data-upload' ),
 		html.Div( id = 'output-data-apriori'),
-
 	])
-	
+
 	def parse_contents(contents, filename):
 		content_type, content_string = contents.split(',')
 		decoded = base64.b64decode(content_string)
@@ -81,7 +67,7 @@ def init_dashboard(server):
 			if 'csv' in filename:
 				df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
 			elif 'txt' in filename:
-				df = pd.read_table(io.StringIO(decoded.decode('utf-8')))
+				 df = pd.read_csv(io.StringIO(decoded.decode("utf-8")), delimiter=r"\s+")
 		except Exception as e:
 			print(e)
 			return html.Div([
