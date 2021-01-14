@@ -20,7 +20,7 @@ def init_dashboard(server):
 	"""Create a Plotly Dash dashboard."""
     #app = dash.Dash(__name__)
 	app = dash.Dash(__name__,server=server,
-	routes_pathname_prefix="/apriori/",
+	routes_pathname_prefix="/correlacion/",
 	external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'],
 	)
 
