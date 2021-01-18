@@ -8,9 +8,12 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 import dash_table
 from dash.exceptions import PreventUpdate
 import pandas as pd
+
+ncd  = 1
 def init_dashboard2(server):
 	"""Create a Plotly Dash dashboard."""
     #app = dash.Dash(__name__)
@@ -45,19 +48,42 @@ def init_dashboard2(server):
 		#html.Div([
 		#	html.Button(id = 'submit', n_clicks = 0, children = 'Mostrar datos'),
 		#]),
-		html.Div([ html.H3("Correlacion")]),	
-			# dcc.Tabs(id = 'tabsControlInput',value='tab-1',
-			# children=[
-			# 	dcc.Dropdown(
-			# 		id = 'correlacion',
-			# 		options=[
-			# 			{'label': 'Pearson', 'value': 'pearson'},
-      #       {'label': 'Kendall', 'value': 'kendall'},
-      #       {'label': 'Spearman', 'value': 'spearman'}
-			# 		],
-			# 		value='pearson',style={'width': '50%','margin': '2%'}),
-		html.Div( id = 'output-data-upload' ),
-		html.Div( id = 'output-data-apriori'),
+		html.Div([ html.H3("Correlacion"),
+      #html.Button('Cargar Archivo', id='loadFile', n_clicks=0,style={'width': '25%','margin': '3%'}),
+	  html.Div( id = 'output-data-upload'),
+		]),
+		dcc.Tabs(id = 'tabs',value = 'tab-1', children=[
+			#dcc.Tab(label = 'Datos',value = 'tab1',children=[
+				dcc.Tab(label='Correlacion', value='tab-1',children=[
+					dcc.Dropdown(id='metodoCorr',
+					options=[
+						      {'label': 'Pearson', 'value': 'pearson'},
+									{'label': 'Kendall', 'value': 'kendall'},
+                  {'label': 'Spearman', 'value': 'spearman'}
+					],
+          value='pearson',style={'width': '50%','margin': '2%'}),
+          html.Button('Ejecutar', id='executeCorr', n_clicks=0,style={'width': '25%','margin': '3%'}),
+					dcc.Tabs(id='display-call',value = 'subtab',
+					children=[
+						dcc.Tab(label = 'Matriz de Correlacion',value = 'matriz',children=[
+							html.Div(id = "crossMatrix")]),
+						dcc.Tab(label = 'Grafica de Calor', value = 'grafica', children= [
+							html.Div(id="graphCrossMatrix")]),
+					]),
+
+				]),     	
+		]),
+		# html.Button('Ejecutar', id='executeCorr', n_clicks=0,style={'width': '25%','margin': '3%'}),
+		# dcc.Tabs(id="subtabs-1",value="subtab-1",
+		# children = [
+    #             dcc.Tab(label='Matriz de correlación',value='subtab-5',children=[
+    #             html.Div(id="crossMatrix"),]),                            
+    #             dcc.Tab(label='Grafica', value='subtab-2',children=[
+    #             html.Div(id="graphCrossMatrix"),]),
+    #             ]),
+		# ),
+
+		#html.Div( id = 'output-data-apriori'),
 	])
 
 	def parse_contents(contents, filename):
@@ -80,6 +106,7 @@ def init_dashboard2(server):
 							[Input('upload-data','contents'),
               State('upload-data', 'filename')])
 	def update_output(content, name):
+
 		if content is not None:
 			datos = parse_contents(content,name)
 			return html.Div([
@@ -106,42 +133,47 @@ def init_dashboard2(server):
 		])
 			
 	# #Callback para recibir valores 
-	@app.callback(Output('output-data-apriori','children'),
-							[Input('upload-data','contents'),
-							Input('submit_button','n_clicks'),
-              State('upload-data', 'filename'),
-							State('support','value'),
-							State('confidence','value'),
-							State('lift','value'),
-							State('length','value')])
-	def update_data(contents,num_clicks,name,support,confidence,lift,length):
+	@app.callback(
+							[ Output('graphCrossMatrix','children'),
+        			  Output('crossMatrix', 'children'),],
+							[
+							Input('upload-data','contents'),
+							Input('metodoCorr','value'),
+							Input('executeCorr','num_clicks'),
+							State('upload-data','filename'),
+							]
+							)
+	def update_data(contents,metodoCorr,num_clicks,filename):
+		table= html.Div()
+		figure = dcc.Graph()
+		global ncd
 		if contents:
-			df = parse_contents(contents,name)
-			if (support and confidence and lift and length) is None:
-				raise PreventUpdate
-			else:
-				registros = []
-				for i in range(df.shape[0]):
-	 	 			registros.append([str(df.values[i,j]) for j in range(0,df.shape[1])])
-		
-				Reglas = apriori (
-				registros,
-				min_support = support,
-				min_confidence = confidence,
-				min_lift = lift ,
-				min_length = length,)
-				Resultados = list(Reglas)
-				print(Resultados[0])
-				return html.Div([
-					html.H3("Valores registrados para crear las reglas"),
-					html.P(str(support)),
-					html.P(str(confidence)),
-					html.P(str(lift)),
-					html.P(str(length)),
-					# dash_table.DataTable(
-					# 	data =  
-					# 	columns = 
-					# )
-					])
+			ncd = ncd + 1
+			#contents = contents[0]
+			#filename = filename[0]
+			df = parse_contents(contents,filename)
+			df = df.set_index(df.columns[0])
+			df = df.corr(method=metodoCorr) 
+			table = html.Div(
+					[
+						dash_table.DataTable(
+							data = df.to_dict("rows"),
+							columns = [{"name": i, "id": i} for i in df.columns],
+						),
+					]
+				),
+				
+			fig = px.imshow(df)
+			figure = html.Div(
+					[
+						dcc.Graph(
+							id = 'kind',
+							figure = fig
+						),
+					]
+				)
+		return figure,table
+			
+
 	return app.server
 	#-----------------------------------
