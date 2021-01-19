@@ -4,16 +4,21 @@ import datetime
 import io
 import plotly
 import plotly.express as px
+from scipy.spatial import distance
+import plotly.graph_objects as go
+import numpy as np
+
+
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
-#import para el algoritmo
-from apyori import apriori
+
 from dash.exceptions import PreventUpdate
 #from .layout import html_layout
 import pandas as pd
+ncd  = 1
 folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files"
 
 def init_dashboard3(server):
@@ -28,7 +33,7 @@ def init_dashboard3(server):
 	#app.index_string = html_layout
 	#Creacion del layout 
 	app.layout = html.Div([
-		html.H1("Algoritmo Apriori"),
+		html.H1("Algoritmo de Distancias"),
 		html.H2("Subir archivos"),
 		dcc.Upload(
 			id = 'upload-data',
@@ -51,26 +56,24 @@ def init_dashboard3(server):
 		#html.Div([
 		#	html.Button(id = 'submit', n_clicks = 0, children = 'Mostrar datos'),
 		#]),
-		html.Div([
-		html.H3("Seleccion de parametros"),
-		html.Div ([
-			html.Label('Soporte minimo'),
-			dcc.Input(id = 'support', type = 'number', inputMode = 'numeric',
-			value = 0.0045, min = 0,required = True),
-			html.Label('Confianza Minima'),
-			dcc.Input(id = 'confidence', type = 'number', inputMode = 'numeric',
-			value = 0.2,min = 0,required = True),
-			html.Label('Elevacion'),
-			dcc.Input(id = 'lift', type = 'number', inputMode = 'numeric',
-			value = 3,min = 0,required = True),
-			html.Label('Minimo de elementos'),
-			dcc.Input(id = 'length', type = 'number', inputMode = 'numeric',
-			value = 2,min = 2,required = True),
-			html.Button(id = 'submit_button' , n_clicks = 0, children = 'submit'),
-		],style = {'display': 'flex','justifyContent':'center'}),
+		html.Div([ html.H3("Distancias"),
+      #html.Button('Cargar Archivo', id='loadFile', n_clicks=0,style={'width': '25%','margin': '3%'}),
+	  html.Div( id = 'output-data-upload'),
 		]),
-		html.Div( id = 'output-data-upload' ),
-		html.Div( id = 'output-data-apriori'),
+		dcc.Tabs(id = 'tabs',value = 'tab-1', children=[
+			#dcc.Tab(label = 'Datos',value = 'tab1',children=[
+				dcc.Tab(label='Distancias', value='tab',children=[
+					dcc.Dropdown(id='distancia',
+					options=[
+						      {'label': 'Chebyshev', 'value': 'chebyshev'},
+									{'label': 'Cityblock', 'value': 'cityblock'},
+                  {'label': 'Euclidean', 'value': 'euclidean'}
+					],
+          value='euclidean',style={'width': '50%','margin': '2%'}),
+          html.Button('Ejecutar', id='executeCorr', n_clicks=0,style={'width': '25%','margin': '3%'}),
+					html.Div(id="distanciaMatrix"),
+				]),     	
+		]),
 
 	])
 	
@@ -120,42 +123,55 @@ def init_dashboard3(server):
 		])
 			
 	# #Callback para recibir valores 
-	@app.callback(Output('output-data-apriori','children'),
-							[Input('upload-data','contents'),
-							Input('submit_button','n_clicks'),
-              State('upload-data', 'filename'),
-							State('support','value'),
-							State('confidence','value'),
-							State('lift','value'),
-							State('length','value')])
-	def update_data(contents,num_clicks,name,support,confidence,lift,length):
+	@app.callback(Output('distanciaMatrix','children'),
+							[
+							Input('upload-data','contents'),
+							Input('distancia','value'),
+							Input('executeCorr','num_clicks'),
+							State('upload-data','filename'),
+							]
+							)
+	def update_data(contents,distancia,num_clicks,filename):
+		table = html.Div()
+		#figure = dcc.Graph()
+		global ncd
 		if contents:
-			df = parse_contents(contents,name)
-			if (support and confidence and lift and length) is None:
-				raise PreventUpdate
-			else:
-				registros = []
-				for i in range(df.shape[0]):
-	 	 			registros.append([str(df.values[i,j]) for j in range(0,df.shape[1])])
-		
-				Reglas = apriori (
-				registros,
-				min_support = support,
-				min_confidence = confidence,
-				min_lift = lift ,
-				min_length = length,)
-				Resultados = list(Reglas)
-				print(Resultados[0])
-				return html.Div([
-					html.H3("Valores registrados para crear las reglas"),
-					html.P(str(support)),
-					html.P(str(confidence)),
-					html.P(str(lift)),
-					html.P(str(length)),
-					# dash_table.DataTable(
-					# 	data =  
-					# 	columns = 
-					# )
-					])
+			ncd = ncd + 1
+			#contents = contents[0]
+			#filename = filename[0]
+			df = parse_contents(contents,filename)
+			df = df.set_index(df.columns[0])
+
+			index = df.index[:].tolist()
+			df = df.values.tolist()
+			df= [df[i] + [index[i]]  for i in range(0,len(df))]
+
+			l = []
+			for i in df :
+				ll = []
+				for j in df:
+					if distancia == 'euclidean':
+						ll.append(round(distance.euclidean(i,j),2))
+					elif distancia == 'cityblock':
+						ll.append(round(distance.cityblock(i,j),2))
+					elif distancia == 'chebyshev':
+						ll.append(round(distance.chebyshev(i,j),2))
+				l.append(ll)
+      
+			df = pd.DataFrame(l)
+			table = html.Div (
+				[
+					dash_table.DataTable(
+						data = df.to_dict("rows"),
+            columns=[{"name": str(i), "id": str(i),"type":"numeric"} for i in df.columns],
+            fixed_rows={'headers': True},
+						style_table={'overflowX': 'auto','overflowY': 'auto'},
+						style_cell={
+						'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+						'overflow': 'scroll'  }
+					),
+				]
+			)
+		return table
 	return app.server
 	#-----------------------------------
