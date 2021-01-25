@@ -19,7 +19,8 @@ def init_app():
     from .plotlydash.correlacion import init_dashboard2
     from .plotlydash.distancias import init_dashboard3
     from .plotlydash.clustering import init_dashboard4
-    from .plotlydash.dash4 import init_dashboard
+    from .plotlydash.Rlogistica import init_dashboard5
+
 
     app = init_dashboard4(app)
     #Compilando static assets 
