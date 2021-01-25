@@ -32,7 +32,7 @@ def init_dashboard5(server):
 	"""Create a Plotly Dash dashboard."""
     #app = dash.Dash(__name__)
 	app = dash.Dash(__name__,server=server,
-	routes_pathname_prefix="/clustering/",
+	routes_pathname_prefix="/clasificacion/",
 	external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'],
 	)
 
@@ -40,7 +40,7 @@ def init_dashboard5(server):
 	#app.index_string = html_layout
 	#Creacion del layout 
 	app.layout = html.Div([
-		html.H1("Algoritmo de Clustering Particional "),
+		html.H1("Algoritmo de Clasificacion "),
 		html.H2("Subir archivos"),
 		dcc.Upload(
 			id = 'upload-data',
@@ -63,22 +63,62 @@ def init_dashboard5(server):
 		#html.Div([
 		#	html.Button(id = 'submit', n_clicks = 0, children = 'Mostrar datos'),
 		#]),
-		html.Div([ html.H3("Clustering Particional "),
+		html.Div([ html.H3("Clasificación con Regresion Logistica"),
       #html.Button('Cargar Archivo', id='loadFile', n_clicks=0,style={'width': '25%','margin': '3%'}),
 	  html.Div( id = 'output-data-upload'),
 		]),
+		html.Div(),
 		dcc.Tabs(id = 'tabs',value = 'tab-1', children=[
 			#dcc.Tab(label = 'Datos',value = 'tab1',children=[
-				dcc.Tab(label='Clustering', value='tab',children=[
-					html.Button('Ejecutar', id='executeCluster', n_clicks=0,style={'width': '25%','margin': '3%'}),
-					dcc.Tabs(id='clus',value='tab2',children=[
-						dcc.Tab(label='Grafica del codo',value='subtab',children=[
-							html.Div(id='elbow'),
-						]),
-						dcc.Tab(label='Grafica del cluster',value='subtab1',children=[
-							html.Div(id='cluster'),
-						]),
-					])
+				dcc.Tab(label='Clasificacion', value='tab',children=[
+					  html.Button('     Ejecutar', id='executeSigmoide', n_clicks=0,
+                    style={'margin': '2%','textAlign': 'center'}),
+                html.Div([
+                    html.Div([
+                        "Compactividad",
+                        dcc.Input(
+                            id="compactividad",  type="number", value= 0.04362,
+                            placeholder="Compactividad",style={'margin': '5%','textAlign': 'center'}),
+                    ],className="three columns"),
+                    html.Div([
+                        "Textura",    
+                        dcc.Input(
+                            id="textura",     type="number", value=24.54,
+                            placeholder="Textura",style={'margin': '5%','textAlign': 'center'}),
+                    ],className="three columns"),
+                ],className="row"),
+                html.Div([
+                    html.Div([
+                        "Area",       
+                        dcc.Input(
+                            id="area",        type="number", value=181.0,
+                            placeholder="Area",style={'margin': '5%','textAlign': 'center'}),
+                    ],className="three columns"),
+                    html.Div([
+                        "Concavidad", 
+                        dcc.Input(
+                            id="concavidad",  type="number",value = 0, 
+                            placeholder="Concavidad",style={'margin': '5%','textAlign': 'center'}),
+                    ],className="three columns"),
+                ],className="row"),
+
+                html.Div([
+                    html.Div([
+                        "Simetria",   
+                        dcc.Input(
+                            id="simetria",  type="number", value=0.1587,
+                            placeholder="Simetria",style={'margin': '5%','textAlign': 'center'}),
+                    ],className="three columns"),
+                    html.Div([
+                        "Dimensión fractal", 
+                        dcc.Input(
+                            id="dimensionFractal",type="number", value=1.0,
+                            placeholder="Dimensión Fractal",style={'margin': '5%','textAlign': 'center'}),
+                    ],className="three columns"),
+                ],className="row"),
+
+                    html.Div(id='sigmoide',style={'textAlign': 'center'}),
+
 				]),     	
 		]),
 
@@ -130,59 +170,57 @@ def init_dashboard5(server):
 		])
 			
 	# #Callback para recibir valores 
-	@app.callback([Output('elbow','children'),
-								Output('cluster','children')],
-							[
-							Input('upload-data','contents'),
-							Input('executeCluster','num_clicks'),
-							State('upload-data','filename'),
-							]
-							)
-	def update_data(contents,num_clicks,filename):
-		table = html.Div()
-		figure1= dcc.Graph()
-		figure2 = dcc.Graph()
+	@app.callback(
+    Output('sigmoide', 'children'),
+    [
+        Input('compactividad','value'),
+        Input('textura','value'),
+        Input('area','value'),
+        Input('concavidad','value'),
+        Input('simetria','value'),
+        Input('dimensionFractal','value'),
+        Input('upload-data', 'contents'),
+        Input('executeSigmoide', 'n_clicks'),
+				State('upload-data', 'filename')
+    ]
+)
+	def update_data(compactividad,textura,area,concavidad,simetria,dimensionFractal,contents,n_clicks, filename):
+		mensaje = html.Div()
 		global ncd
 		if contents:
 			ncd = ncd + 1
 			#contents = contents[0]
 			#filename = filename[0]
 			df = parse_contents(contents,filename)
-			VariablesModelo = df.iloc[:,:].values
-			SSE = []
-			for i in range(2, 16):
-				km = KMeans(n_clusters=i)
-				km.fit(VariablesModelo)
-				SSE.append(km.inertia_)
-			
-			x = np.arange(len(SSE))
-			fig = go.Figure( data=   go.Scatter(x=x,y=SSE))
-			kl = KneeLocator(range(2, 16), SSE, curve="convex", direction="decreasing")
-			MParticional = KMeans(n_clusters=kl.elbow, random_state=0).fit(VariablesModelo)
-			model = KMeans(n_clusters = kl.elbow, init = "k-means++", max_iter = 300, n_init = 10, random_state =   0)
-			y_clusters = model.fit_predict(VariablesModelo)
-			labels = model.labels_
-			trace = go.Scatter3d(x=VariablesModelo[:, 0], y=VariablesModelo[:, 1], z=VariablesModelo[:, 2],     mode='markers',marker=dict(color = labels, size= 3,line=dict(color= 'black',width = 3)))
-			layout = go.Layout(margin=dict(l=0,r=0))
-			data = [trace]
-			fig2 = go.Figure(data = data, layout = layout)
+			df = df.set_index(df.columns[0])
+			X = np.array(df[['Texture', 'Area', 'Compactness','Concavity', 'Symmetry', 'FractalDimension']])	
+			Y = np.array(df[['Diagnosis']])
 
-			figure1 = html.Div(
-			[
-				dcc.Graph(
-					id='kind',
-					figure=fig
-				),
-			]
-		)
-			figure2 = html.Div(
-			[
-				dcc.Graph(
-					id='kind2',
-					figure=fig2
-					)
-			]
-		) 
-		return figure1,figure2
+			Clasificacion = linear_model.LogisticRegression()
+			validation_size = 0.2
+			seed = 1234
+			X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(
+                                X, Y, test_size=validation_size, random_state=seed, shuffle = True)
+			Clasificacion.fit(X_train, Y_train)
+			Probabilidad = Clasificacion.predict_proba(X_train)
+			Predicciones = Clasificacion.predict(X_train)
+			Clasificacion.score(X_train, Y_train)
+			PrediccionesNuevas = Clasificacion.predict(X_validation)
+			confusion_matrix = pd.crosstab(Y_validation.ravel(), PrediccionesNuevas, 
+                                rownames=['Real'], colnames=           ['Predicción'])
+			v = Clasificacion.score(X_validation, Y_validation)
+			NuevoPaciente = pd.DataFrame({  'Texture': [textura],           'Area': [area], 
+                                            'Compactness': [compactividad], 'Concavity': [concavidad], 
+                                            'Symmetry': [simetria],         'FractalDimension': [dimensionFractal]})
+
+			print(Clasificacion.predict(NuevoPaciente))
+			if  Clasificacion.predict(NuevoPaciente) == "B":
+				mensaje = html.Div(
+                        html.H5("Con una  certeza del " + str(format(v*100, '.2f') ) +"% se pronostica POSITIVO a Cancer ")
+                )
+			else:
+				mensaje = html.Div(
+                        html.H5("Con una  certeza del " + str(format(v*100, '.2f'))  +"% se pronostica NEGATIVO a Cancer "))
+		return mensaje
 	return app.server
 	#-----------------------------------
