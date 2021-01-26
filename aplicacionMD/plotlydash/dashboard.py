@@ -146,16 +146,20 @@ def init_dashboard1(server):
 				min_length = length,)
 				Resultados = list(Reglas)
 				print(Resultados[0])
-				return html.Div([
-					html.H3("Valores registrados para crear las reglas"),
-					html.P(str(support)),
-					html.P(str(confidence)),
-					html.P(str(lift)),
-					html.P(str(length)),
-					# dash_table.DataTable(
-					# 	data =  
-					# 	columns = 
-					# )
-					])
+
+				df = pd.DataFrame(Resultados)
+
+				table = html.Div([
+                dash_table.DataTable(
+                    data=df.to_dict("rows"),
+                    columns=[{"name": str(i), "id": str(i)} for i in df.columns],
+                    fixed_rows={'headers': True},
+                    style_table={'overflowX': 'auto','overflowY': 'auto'},
+                    style_cell={
+                    'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                    'overflow': 'scroll'  }
+                ), 
+            ])
+		return table
 	return app.server
 	#-----------------------------------
