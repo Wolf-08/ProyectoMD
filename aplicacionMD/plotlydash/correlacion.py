@@ -62,7 +62,7 @@ def init_dashboard2(server):
                   {'label': 'Spearman', 'value': 'spearman'}
 					],
           value='pearson',style={'width': '50%','margin': '2%'}),
-          html.Button('Ejecutar', id='executeCorr', n_clicks=0,style={'width': '25%','margin': '3%'}),
+          html.Button('Gráfica', id='executeCorr', n_clicks=0,style={'width': '25%','margin': '3%','background-color':'black','color':'white'}),
 					dcc.Tabs(id='display-call',value = 'subtab',
 					children=[
 						dcc.Tab(label = 'Matriz de Correlacion',value = 'matriz',children=[

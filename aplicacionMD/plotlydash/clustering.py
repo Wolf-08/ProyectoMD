@@ -70,7 +70,7 @@ def init_dashboard4(server):
 		dcc.Tabs(id = 'tabs',value = 'tab-1', children=[
 			#dcc.Tab(label = 'Datos',value = 'tab1',children=[
 				dcc.Tab(label='Clustering', value='tab',children=[
-					html.Button('Ejecutar', id='executeCluster', n_clicks=0,style={'width': '25%','margin': '3%'}),
+					html.Button('Monstrar Graficas', id='executeCluster', n_clicks=0,style={'width': '25%','margin': '3%','background-color':'black','color':'white'}),
 					dcc.Tabs(id='clus',value='tab2',children=[
 						dcc.Tab(label='Grafica del codo',value='subtab',children=[
 							html.Div(id='elbow'),

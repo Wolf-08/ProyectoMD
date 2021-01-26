@@ -67,7 +67,7 @@ def init_dashboard1(server):
 			dcc.Input(id = 'length', type = 'number', inputMode = 'numeric',
 			value = 2,min = 2,required = True),
 			html.Button(id = 'submit_button' , n_clicks = 0, children = 'submit'),
-		],style = {'display': 'flex','justifyContent':'center'}),
+		],style={'width': '25%','margin': '3%','background-color':'black','color':'white'}),
 		]),
 		html.Div( id = 'output-data-upload' ),
 		html.Div( id = 'output-data-apriori'),
@@ -129,6 +129,7 @@ def init_dashboard1(server):
 							State('lift','value'),
 							State('length','value')])
 	def update_data(contents,num_clicks,name,support,confidence,lift,length):
+		table = html.Div()
 		if contents:
 			df = parse_contents(contents,name)
 			if (support and confidence and lift and length) is None:

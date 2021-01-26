@@ -71,8 +71,8 @@ def init_dashboard5(server):
 		dcc.Tabs(id = 'tabs',value = 'tab-1', children=[
 			#dcc.Tab(label = 'Datos',value = 'tab1',children=[
 				dcc.Tab(label='Clasificacion', value='tab',children=[
-					  html.Button('     Ejecutar', id='executeSigmoide', n_clicks=0,
-                    style={'margin': '2%','textAlign': 'center'}),
+					  html.Button('Diagnosticar', id='executeSigmoide', n_clicks=0,
+                    style={'width': '25%','margin': '3%','background-color':'black','color':'white'}),
                 html.Div([
                     html.Div([
                         "Compactividad",
@@ -216,11 +216,11 @@ def init_dashboard5(server):
 			print(Clasificacion.predict(NuevoPaciente))
 			if  Clasificacion.predict(NuevoPaciente) == "B":
 				mensaje = html.Div(
-                        html.H5("Con una  certeza del " + str(format(v*100, '.2f') ) +"% se pronostica POSITIVO a Cancer ")
+                        html.H5("Con una confianza de " + str(format(v*100, '.2f') ) +"% Se diagnostica positivo ")
                 )
 			else:
 				mensaje = html.Div(
-                        html.H5("Con una  certeza del " + str(format(v*100, '.2f'))  +"% se pronostica NEGATIVO a Cancer "))
+                        html.H5("Con una confianza de  " + str(format(v*100, '.2f'))  +"% Se diagnostica negativo "))
 		return mensaje
 	return app.server
 	#-----------------------------------

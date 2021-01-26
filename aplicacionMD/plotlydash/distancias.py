@@ -70,7 +70,7 @@ def init_dashboard3(server):
                   {'label': 'Euclidean', 'value': 'euclidean'}
 					],
           value='euclidean',style={'width': '50%','margin': '2%'}),
-          html.Button('Ejecutar', id='executeCorr', n_clicks=0,style={'width': '25%','margin': '3%'}),
+          html.Button('Mostrar Matriz', id='executeCorr', n_clicks=0,style={'width': '25%','margin': '3%','background-color':'black','color':'white'}),
 					html.Div(id="distanciaMatrix"),
 				]),     	
 		]),

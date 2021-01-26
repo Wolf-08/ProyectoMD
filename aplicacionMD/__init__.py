@@ -22,7 +22,7 @@ def init_app():
     from .plotlydash.Rlogistica import init_dashboard5
 
 
-    app = init_dashboard5(app)
+    app = init_dashboard1(app)
     #Compilando static assets 
     #compile_static_assets(assets)
 
