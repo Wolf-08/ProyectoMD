@@ -25,7 +25,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 from kneed import KneeLocator   
-ncd  = 1
+aux  = 1
 folder= "C:\\Users\\aleja\\Documents\\ProyectoMD\\aplicacionMD\\static\\files"
 
 def init_dashboard5(server):
@@ -186,11 +186,9 @@ def init_dashboard5(server):
 )
 	def update_data(compactividad,textura,area,concavidad,simetria,dimensionFractal,contents,n_clicks, filename):
 		mensaje = html.Div()
-		global ncd
+		global aux
 		if contents:
-			ncd = ncd + 1
-			#contents = contents[0]
-			#filename = filename[0]
+			aux = aux + 1
 			df = parse_contents(contents,filename)
 			df = df.set_index(df.columns[0])
 			X = np.array(df[['Texture', 'Area', 'Compactness','Concavity', 'Symmetry', 'FractalDimension']])	

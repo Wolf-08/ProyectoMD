@@ -13,7 +13,7 @@ import dash_table
 from dash.exceptions import PreventUpdate
 import pandas as pd
 
-ncd  = 1
+aux  = 1
 def init_dashboard2(server):
 	"""Create a Plotly Dash dashboard."""
     #app = dash.Dash(__name__)
@@ -146,11 +146,10 @@ def init_dashboard2(server):
 	def update_data(contents,metodoCorr,num_clicks,filename):
 		table= html.Div()
 		figure = dcc.Graph()
-		global ncd
+		global aux
 		if contents:
-			ncd = ncd + 1
-			#contents = contents[0]
-			#filename = filename[0]
+			aux = aux + 1
+			
 			df = parse_contents(contents,filename)
 			df = df.set_index(df.columns[0])
 			df = df.corr(method=metodoCorr) 
